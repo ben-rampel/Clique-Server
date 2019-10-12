@@ -84,8 +84,9 @@ public class APIController {
     }
     //Get groups near user
     @GetMapping("/getGroups")
-    public List<Group> getGroups(@RequestBody Location location){
-        logger.info("Finding group near location {} {}", location.getLongitude(), location.getLatitude());
+    public List<Group> getGroups(@RequestParam Double longitude, @RequestParam Double latitude) {
+        logger.info("Finding group near location {} {}", longitude, latitude);
+        Location location = new Location(longitude, latitude);
         List<Group> result = new ArrayList<>();
         for(Group g : groupRepository.findAll()){
             //if group is within 1 mile of specified location
@@ -124,7 +125,7 @@ public class APIController {
 
     //Get group info, including people wanting to join group
     @GetMapping("/getGroup/{id}")
-    public Group getGroup(@RequestParam Long id){
+    public Group getGroup(@PathVariable Long id) {
         logger.info("Getting group {}", id);
         if(!groupRepository.findById(id).isPresent()) return null;
         return groupRepository.findById(id).get();

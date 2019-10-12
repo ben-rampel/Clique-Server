@@ -1,11 +1,14 @@
 package com.fordexplorer.clique.data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Message")
-public class Message {
+public class Message implements Serializable {
+
+    private static final long serialVersionUID = 4L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
