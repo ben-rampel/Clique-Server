@@ -23,9 +23,8 @@ public class ChatController {
     private GroupRepository groupRepository;
     private ObjectMapper mapper;
 
-    //TODO: inject group repository
     @Autowired
-    public ChatController(SimpMessageSendingOperations messagingTemplate){
+    public ChatController(SimpMessageSendingOperations messagingTemplate, GroupRepository groupRepository){
         mapper = new ObjectMapper();
     }
 
