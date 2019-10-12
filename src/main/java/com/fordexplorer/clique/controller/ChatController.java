@@ -28,15 +28,8 @@ public class ChatController {
         mapper = new ObjectMapper();
     }
 
-    @MessageMapping("chat/{id}/sendMessage")
-    public void acceptMessage(@RequestBody Message message, @PathVariable Long id) {
-        if(!groupRepository.findById(id).isPresent()){
-            throw new RuntimeException("Group from chat channel ID not found");
-        } else {
-            if(!groupRepository.findById(id).get().equals(message.getAuthor().getCurrentGroup())){
-                throw new RuntimeException("Group from chat channel ID not same as user's group");
-            }
-        }
+    @MessageMapping("/sendMessage")
+    public void acceptMessage(@RequestBody Message message) {
         //Add message to list
         message.getAuthor().getCurrentGroup().addMessage(message);
         //Push message to group channel
