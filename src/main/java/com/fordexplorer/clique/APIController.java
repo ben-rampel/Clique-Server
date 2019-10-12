@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class apiController {
+public class APIController {
     /* Account management */
 
     //Create user
