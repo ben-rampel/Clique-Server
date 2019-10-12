@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -75,11 +76,13 @@ public class APIController {
 
     //Create group
     @PostMapping("/createGroup")
-    public void createGroup(@AuthenticationPrincipal Person person, @RequestBody Group toAdd) {
+    public void createGroup(@AuthenticationPrincipal UserDetails person, @RequestBody Group toAdd) {
         logger.info("{} is trying to create group", person.getUsername());
-        toAdd.addMember(person);
+        Person owner = personRepository.findPersonByUsername(person.getUsername());
+        toAdd.addMember(owner);
         groupRepository.save(toAdd);
     }
+
     //Get groups near user
     @GetMapping("/getGroups")
     public List<Group> getGroups(@RequestParam Double longitude, @RequestParam Double latitude) {
