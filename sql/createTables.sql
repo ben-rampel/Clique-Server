@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS PersonGroup
 (
     Id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     MemberTurnover INTEGER         NOT NULL,
-    Name           VARCHAR(50),
+    Name           VARCHAR(50)     NOT NULL,
     Description    VARCHAR(2000),
     Longitude      DECIMAL(30, 10),
     Latitude       DECIMAL(30, 10),

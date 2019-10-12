@@ -96,6 +96,7 @@ public class APIController {
                 result.add(g);
             }
         }
+        logger.info("Found {} groups near location {} {}", result.size(), longitude, latitude);
         return result;
     }
 
