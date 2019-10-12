@@ -29,9 +29,16 @@ public class Group implements Serializable {
     @Embedded
     private Location location;
 
+    private List<Message> groupMessages;
+
+    public List<Message> getGroupMessages() {
+        return groupMessages;
+    }
+
     public Group(){
         members = new HashMap<>();
         pendingMembers = new HashSet<>();
+        groupMessages = new LinkedList<>();
     }
 
     public List<Person> getMembers() {
@@ -42,6 +49,10 @@ public class Group implements Serializable {
             }
         }
         return result;
+    }
+
+    public void addMessage(Message m){
+        groupMessages.add(m);
     }
 
     public void setMembers(List<Person> members) {
@@ -100,5 +111,9 @@ public class Group implements Serializable {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

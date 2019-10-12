@@ -44,6 +44,4 @@ public class APIController {
     public Group getGroup(@RequestParam String id){
         return null;
     }
-    /* Group interaction */
-    //Chat
 }
