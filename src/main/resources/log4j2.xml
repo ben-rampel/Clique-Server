@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN">
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <RollingFile fileName="/tmp/clique.log" filePattern="/tmp/clique-%d{MM-dd-yyyy}-%i.log"
+                     name="clique">
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss.SSS} [%t] %X{id} %X{username} %-5level %c{36} %l: %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="4" min="1"/>
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <logger level="INFO" name="com.fordexplorer">
+            <appender-ref ref="clique"/>
+            <appender-ref ref="Console"/>
+        </logger>
+        <logger level="INFO" name="org.apache">
+            <appender-ref ref="clique"/>
+            <appender-ref ref="Console"/>
+        </logger>
+        <logger level="INFO" name="org.springframework">
+            <appender-ref ref="clique"/>
+            <appender-ref ref="Console"/>
+        </logger>
+        <Root level="INFO">
+            <appender-ref ref="clique"/>
+            <appender-ref ref="Console"/>
+        </Root>
+    </loggers>
+</configuration>
