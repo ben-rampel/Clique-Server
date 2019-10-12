@@ -27,7 +27,7 @@ public class APIController {
     private JwtTokenManager jwtTokenManager;
 
     @Autowired
-    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager){
+    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager) {
         this.groupRepository = groupRepository;
         this.personRepository = personRepository;
         this.jwtTokenManager = jwtTokenManager;
@@ -37,27 +37,28 @@ public class APIController {
 
     //Create user
     @PostMapping("/registerUser")
-    public ResponseEntity<String> registerUser(@RequestBody Person person){
+    public ResponseEntity<String> registerUser(@RequestBody Person person) {
         logger.info("Registering user {}", person.getUsername());
         personRepository.save(person);
         String token = String.format("{\n\"token\": \"%s\"\n}", jwtTokenManager.createToken(person.getUsername()));
         logger.info("Returning Token {}", token);
-        return new ResponseEntity<>(token,HttpStatus.OK);
+        return new ResponseEntity<>(token, HttpStatus.OK);
     }
+
     //Login
     //login(credentials) -> JWT Token
     @PostMapping("/login")
-    public ResponseEntity<String> login(String username, String password){
+    public ResponseEntity<String> login(String username, String password) {
         logger.info("Authentication user {}", username);
         Person person = personRepository.findPersonByUsername(username);
-        if(person == null) {
+        if (person == null) {
             logger.info("User {} Not Found", username);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(person.getPassword().equals(password)){
+        if (person.getPassword().equals(password)) {
             logger.info("User {} logged in", username);
             String token = String.format("{token: %s}", jwtTokenManager.createToken(username));
-            return new ResponseEntity<>(token,HttpStatus.OK);
+            return new ResponseEntity<>(token, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -87,16 +88,19 @@ public class APIController {
     //Get groups near user
     @GetMapping("/getGroups")
     public List<Group> getGroups(@RequestParam Double longitude, @RequestParam Double latitude) {
-        logger.info("Finding group near location {} {}", longitude, latitude);
-        Location location = new Location(longitude, latitude);
+        logger.info("Finding group near location {} {}", latitude, longitude);
+        Location location = new Location(latitude, longitude);
         List<Group> result = new ArrayList<>();
-        for(Group g : groupRepository.findAll()){
+        for (Group g : groupRepository.findAll()) {
+            logger.info("Examining group {} at location {}, {}", g.getName(), g.getLocation().getLatitude(), g.getLocation().getLongitude());
             //if group is within 1 mile of specified location
-            if(g.getLocation().distanceTo(location) < 1){
+            double distance = g.getLocation().distanceTo(location);
+            logger.info("Group {} distance {} miles", g.getName(), distance);
+            if (distance < 1) {
                 result.add(g);
             }
         }
-        logger.info("Found {} groups near location {} {}", result.size(), longitude, latitude);
+        logger.info("Found {} groups near location {} {}", result.size(), latitude, longitude);
         return result;
     }
 
@@ -104,7 +108,7 @@ public class APIController {
     @PostMapping("/joinGroup/{id}")
     public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
         logger.info("Adding {} to group {}", person.getUsername(), id);
-        if(groupRepository.findById(id).isPresent()){
+        if (groupRepository.findById(id).isPresent()) {
             groupRepository.findById(id).get().addMember(person);
             logger.info("Added {} to the group {}", person.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -117,7 +121,7 @@ public class APIController {
     @PostMapping("/leaveGroup/{id}")
     public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
         logger.info("{} is trying to leave group {}", person.getUsername(), id);
-        if(groupRepository.findById(id).isPresent()){
+        if (groupRepository.findById(id).isPresent()) {
             groupRepository.findById(id).get().removeMember(person);
             logger.info("{} has left group {}", person.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -130,7 +134,7 @@ public class APIController {
     @GetMapping("/getGroup/{id}")
     public Group getGroup(@PathVariable Long id) {
         logger.info("Getting group {}", id);
-        if(!groupRepository.findById(id).isPresent()) return null;
+        if (!groupRepository.findById(id).isPresent()) return null;
         return groupRepository.findById(id).get();
     }
 }
