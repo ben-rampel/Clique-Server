@@ -34,7 +34,7 @@ public class Person implements UserDetails, Serializable {
 
     @ElementCollection
     @CollectionTable(name = "PersonInterest", joinColumns = @JoinColumn(name = "PersonId"))
-    @Column(name = "interest")
+    @Column(name = "Interest")
     private List<String> interests;
 
     @Basic
