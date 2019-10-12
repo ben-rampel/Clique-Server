@@ -1,4 +1,4 @@
-package com.fordexplorer.clique;
+package com.fordexplorer.clique.controller;
 
 import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Location;

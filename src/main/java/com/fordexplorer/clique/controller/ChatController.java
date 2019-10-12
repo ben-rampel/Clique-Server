@@ -1,4 +1,4 @@
-package com.fordexplorer.clique;
+package com.fordexplorer.clique.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
