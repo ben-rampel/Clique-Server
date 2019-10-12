@@ -1,7 +1,15 @@
-package com.fordexplorer.clique;
+package com.fordexplorer.clique.data;
 
+import javax.persistence.Basic;
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class Location {
+
+    @Basic
     private final double longitude;
+
+    @Basic
     private final double latitude;
 
     public Location(double longitude, double latitude) {
