@@ -24,7 +24,7 @@ public class JwtTokenManager {
 
     @PostConstruct
     public void init() {
-        serverSecret = Keys.hmacShaKeyFor("password".getBytes(StandardCharsets.UTF_8));
+        serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
     }
 
     public String createToken(String username) {

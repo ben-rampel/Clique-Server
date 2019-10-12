@@ -7,21 +7,12 @@ buildscript {
     }
 }
 
-plugins {
-    id 'org.siouan.frontend' version '1.1.0'
-}
-
 apply plugin: 'java'
 apply plugin: "war"
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.siouan.frontend'
-
-frontend {
-    nodeVersion.set('6.17.1')
-}
 
 bootWar {
     archivesBaseName = 'clique'

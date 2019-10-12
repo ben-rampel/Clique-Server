@@ -18,7 +18,7 @@ public class Message {
     @Basic
     private String content;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "Date", columnDefinition = "TIMESTAMP")
     private LocalDateTime date;
 
     public Message(Person author, String content) {
