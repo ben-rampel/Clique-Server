@@ -1,3 +1,6 @@
+CREATE DATABASE clique;
+GRANT ALL ON clique.* TO 'clique'@'localhost' IDENTIFIED BY 'clique';
+
 CREATE TABLE IF NOT EXISTS PersonGroup
 (
     Id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
