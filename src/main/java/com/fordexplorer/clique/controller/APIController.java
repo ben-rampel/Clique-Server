@@ -77,10 +77,11 @@ public class APIController {
     //Create group
     @PostMapping("/createGroup")
     public void createGroup(@AuthenticationPrincipal UserDetails person, @RequestBody Group toAdd) {
-        logger.info("{} is trying to create group", person.getUsername());
+        logger.info("{} is trying to create group {}", person.getUsername(), toAdd.getName());
         Person owner = personRepository.findPersonByUsername(person.getUsername());
         toAdd.addMember(owner);
         groupRepository.save(toAdd);
+        logger.info("group {} is created", toAdd.getName());
     }
 
     //Get groups near user
