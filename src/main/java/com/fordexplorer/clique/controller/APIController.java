@@ -37,24 +37,24 @@ public class APIController {
     //Create user
     @PostMapping("/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody Person person){
-        logger.debug("Registering user {}", person.getUsername());
+        logger.info("Registering user {}", person.getUsername());
         personRepository.save(person);
         String token = String.format("{token: %s}", jwtTokenManager.createToken(person.getUsername()));
-        logger.debug("Returning Token {}", token);
+        logger.info("Returning Token {}", token);
         return new ResponseEntity<>(token,HttpStatus.OK);
     }
     //Login
     //login(credentials) -> JWT Token
     @PostMapping("/login")
     public ResponseEntity<String> login(String username, String password){
-        logger.debug("Authentication user {}", username);
+        logger.info("Authentication user {}", username);
         Person person = personRepository.findPersonByUsername(username);
         if(person == null) {
-            logger.debug("User {} Not Found", username);
+            logger.info("User {} Not Found", username);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(person.getPassword().equals(password)){
-            logger.debug("User {} logged in", username);
+            logger.info("User {} logged in", username);
             String token = String.format("{token: %s}", jwtTokenManager.createToken(username));
             return new ResponseEntity<>(token,HttpStatus.OK);
         } else {
@@ -65,7 +65,7 @@ public class APIController {
     //Get user profile
     @GetMapping("/getUser/{username}")
     public Person getUser(@PathVariable String username) {
-        logger.debug("Getting User Profile for {}", username);
+        logger.info("Getting User Profile for {}", username);
         return personRepository.findPersonByUsername(username);
 
         //maybe only allow access if the person you're looking up is trying to join your group?
@@ -76,7 +76,7 @@ public class APIController {
     //Create group
     @PostMapping("/createGroup")
     public void createGroup(@AuthenticationPrincipal Person person){
-        logger.debug("{} is trying to create group", person.getUsername());
+        logger.info("{} is trying to create group", person.getUsername());
         Group group = new Group();
         //Add the creator of the group
         group.addMember(person);
@@ -85,7 +85,7 @@ public class APIController {
     //Get groups near user
     @GetMapping("/getGroups")
     public List<Group> getGroups(@RequestBody Location location){
-        logger.debug("Finding group near location {} {}", location.getLongitude(), location.getLatitude());
+        logger.info("Finding group near location {} {}", location.getLongitude(), location.getLatitude());
         List<Group> result = new ArrayList<>();
         for(Group g : groupRepository.findAll()){
             //if group is within 1 mile of specified location
@@ -99,10 +99,10 @@ public class APIController {
     //Join group
     @PostMapping("/joinGroup/{id}")
     public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
-        logger.debug("Adding {} to group {}", person.getUsername(), id);
+        logger.info("Adding {} to group {}", person.getUsername(), id);
         if(groupRepository.findById(id).isPresent()){
             groupRepository.findById(id).get().addMember(person);
-            logger.debug("Added {} to the group {}", person.getUsername(), id);
+            logger.info("Added {} to the group {}", person.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -112,10 +112,10 @@ public class APIController {
     //Leave group
     @PostMapping("/leaveGroup/{id}")
     public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
-        logger.debug("{} is trying to leave group {}", person.getUsername(), id);
+        logger.info("{} is trying to leave group {}", person.getUsername(), id);
         if(groupRepository.findById(id).isPresent()){
             groupRepository.findById(id).get().removeMember(person);
-            logger.debug("{} has left group {}", person.getUsername(), id);
+            logger.info("{} has left group {}", person.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -125,7 +125,7 @@ public class APIController {
     //Get group info, including people wanting to join group
     @GetMapping("/getGroup/{id}")
     public Group getGroup(@RequestParam Long id){
-        logger.debug("Getting group {}", id);
+        logger.info("Getting group {}", id);
         if(!groupRepository.findById(id).isPresent()) return null;
         return groupRepository.findById(id).get();
     }
