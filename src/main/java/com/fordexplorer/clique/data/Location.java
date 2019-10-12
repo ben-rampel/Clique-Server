@@ -2,9 +2,12 @@ package com.fordexplorer.clique.data;
 
 import javax.persistence.Basic;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 @Embeddable
-public class Location {
+public class Location implements Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     @Basic
     private final double longitude;

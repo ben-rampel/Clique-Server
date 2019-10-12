@@ -1,17 +1,20 @@
 package com.fordexplorer.clique.data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "Group")
-public class Group {
+public class Group implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "currentGroup")
+    @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL)
     @MapKey(name = "id")
     private Map<Long, Person> members;
 
