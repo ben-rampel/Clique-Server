@@ -1,6 +1,7 @@
 package com.fordexplorer.clique.controller;
 
 import com.fordexplorer.clique.auth.JwtTokenManager;
+import com.fordexplorer.clique.auth.UserDetailService;
 import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Location;
 import com.fordexplorer.clique.data.Person;
@@ -9,6 +10,8 @@ import com.fordexplorer.clique.db.PersonRepository;
 import jdk.nashorn.internal.ir.debug.JSONWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,10 +19,18 @@ import java.util.List;
 
 @RestController
 public class APIController {
-    @Autowired
     private GroupRepository groupRepository;
     private PersonRepository personRepository;
     private JwtTokenManager jwtTokenManager;
+    private UserDetailService userDetailService;
+
+    @Autowired
+    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager, UserDetailService userDetailService){
+        this.groupRepository = groupRepository;
+        this.personRepository = personRepository;
+        this.jwtTokenManager = jwtTokenManager;
+        this.userDetailService = userDetailService;
+    }
 
     /* Account management */
 
@@ -50,16 +61,18 @@ public class APIController {
     @GetMapping("/getProfile/{username}")
     public Person getProfile(@PathVariable String username) {
         return personRepository.findPersonByUsername(username);
+
+        //maybe only allow access if the person you're looking up is trying to join your group?
     }
 
     /* Group management */
 
     //Create group
     @PostMapping("/createGroup")
-    public void createGroup(@RequestBody String username){
+    public void createGroup(@AuthenticationPrincipal Person person){
         Group group = new Group();
-        //Add the creater of the group
-        group.addMember(personRepository.findPersonByUsername(username));
+        //Add the creator of the group
+        group.addMember(person);
         groupRepository.save(group);
     }
     //Get groups near user
@@ -74,6 +87,18 @@ public class APIController {
         }
         return result;
     }
+
+    //Join group
+    @PostMapping("/joinGroup/{id}")
+    public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
+        if(groupRepository.findById(id).isPresent()){
+            groupRepository.findById(id).get().addMember(person);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     //Get group info, including people wanting to join group
     @GetMapping("/getGroup/{id}")
     public Group getGroup(@RequestParam Long id){
