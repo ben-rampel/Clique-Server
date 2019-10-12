@@ -4,6 +4,8 @@ import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Person;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class apiController {
     /* Account management */
@@ -32,8 +34,15 @@ public class apiController {
         //group.addMember();
     }
     //Get groups near user
+    @GetMapping("/getGroups")
+    public List<Group> getGroups(@RequestBody Location location){
+        return null;
+    }
     //Get group info, including people wanting to join group
-
+    @GetMapping("/getGroup/{id}")
+    public Group getGroup(@RequestParam String id){
+        return null;
+    }
     /* Group interaction */
     //Chat
 }

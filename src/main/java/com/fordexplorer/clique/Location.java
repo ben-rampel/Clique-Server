@@ -1,0 +1,42 @@
+package com.fordexplorer.clique;
+
+public class Location {
+    private final double longitude;
+    private final double latitude;
+
+    public Location(double longitude, double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    //Return the distance between one Location and another in miles
+    public double distanceTo(Location other){
+        /* from geeksforgeeks.org */
+        double lon1 = Math.toRadians(this.longitude);
+        double lon2 = Math.toRadians(other.longitude);
+        double lat1 = Math.toRadians(this.latitude);
+        double lat2 = Math.toRadians(other.latitude);
+
+        // Haversine formula
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        double r = 3956;
+
+        // calculate the result
+        return(c * r);
+    }
+}
