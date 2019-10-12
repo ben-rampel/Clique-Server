@@ -1,4 +1,4 @@
-package com.fordexplorer.clique;
+package com.fordexplorer.clique.controller;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
