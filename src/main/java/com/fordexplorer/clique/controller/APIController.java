@@ -99,6 +99,17 @@ public class APIController {
         }
     }
 
+    //Leave group
+    @PostMapping("/leaveGroup/{id}")
+    public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
+        if(groupRepository.findById(id).isPresent()){
+            groupRepository.findById(id).get().removeMember(person);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     //Get group info, including people wanting to join group
     @GetMapping("/getGroup/{id}")
     public Group getGroup(@RequestParam Long id){

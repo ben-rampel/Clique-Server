@@ -75,6 +75,14 @@ public class Group implements Serializable {
         this.pendingMembers.remove(person.getId());
     }
 
+    public void removeMember(Person person){
+        for(Map.Entry<Long, Person> entry : members.entrySet()){
+            if(entry.getValue().equals(person)){
+                members.remove(entry.getKey());
+            }
+        }
+    }
+
     public int getMemberTurnover() {
         return memberTurnover;
     }
