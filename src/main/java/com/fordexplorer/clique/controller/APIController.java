@@ -22,14 +22,12 @@ public class APIController {
     private GroupRepository groupRepository;
     private PersonRepository personRepository;
     private JwtTokenManager jwtTokenManager;
-    private UserDetailService userDetailService;
 
     @Autowired
-    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager, UserDetailService userDetailService){
+    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager){
         this.groupRepository = groupRepository;
         this.personRepository = personRepository;
         this.jwtTokenManager = jwtTokenManager;
-        this.userDetailService = userDetailService;
     }
 
     /* Account management */
@@ -58,8 +56,8 @@ public class APIController {
     }
 
     //Get user profile
-    @GetMapping("/getProfile/{username}")
-    public Person getProfile(@PathVariable String username) {
+    @GetMapping("/getUser/{username}")
+    public Person getUser(@PathVariable String username) {
         return personRepository.findPersonByUsername(username);
 
         //maybe only allow access if the person you're looking up is trying to join your group?
@@ -93,6 +91,17 @@ public class APIController {
     public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
         if(groupRepository.findById(id).isPresent()){
             groupRepository.findById(id).get().addMember(person);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    //Leave group
+    @PostMapping("/leaveGroup/{id}")
+    public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
+        if(groupRepository.findById(id).isPresent()){
+            groupRepository.findById(id).get().removeMember(person);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
