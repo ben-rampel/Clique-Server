@@ -35,7 +35,7 @@ public class JwtTokenManager {
         Date now = new Date();
         Date valid = new Date(Long.MAX_VALUE);
 
-        return Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(valid).signWith(SignatureAlgorithm.HS256, serverSecret).compact();
+        return Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(valid).signWith(serverSecret, SignatureAlgorithm.HS256).compact();
     }
 
     public String getUsername(String token) {
