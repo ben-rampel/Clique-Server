@@ -26,9 +26,12 @@ public class Group {
     @Embedded
     private Location location;
 
+    List<Message> groupMessages;
+
     public Group(){
         members = new HashMap<>();
         pendingMembers = new HashSet<>();
+        groupMessages = new LinkedList<>();
     }
 
     public List<Person> getMembers() {
@@ -39,6 +42,10 @@ public class Group {
             }
         }
         return result;
+    }
+
+    public void addMessage(Message m){
+        groupMessages.add(m);
     }
 
     public void setMembers(List<Person> members) {
@@ -97,5 +104,9 @@ public class Group {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
