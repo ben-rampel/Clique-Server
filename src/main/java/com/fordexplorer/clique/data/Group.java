@@ -23,6 +23,9 @@ public class Group {
     @Basic
     private int memberTurnover;
 
+    @Embedded
+    private Location location;
+
     public Group(){
         members = new HashMap<>();
         pendingMembers = new HashSet<>();
@@ -86,5 +89,13 @@ public class Group {
     public void addWannabeMember(Person person) {
         this.members.put(person.getId(), person);
         this.pendingMembers.add(person.getId());
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

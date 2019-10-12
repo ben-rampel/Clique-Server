@@ -1,6 +1,7 @@
 package com.fordexplorer.clique;
 
 import com.fordexplorer.clique.data.Group;
+import com.fordexplorer.clique.data.Location;
 import com.fordexplorer.clique.data.Person;
 import org.springframework.web.bind.annotation.*;
 
