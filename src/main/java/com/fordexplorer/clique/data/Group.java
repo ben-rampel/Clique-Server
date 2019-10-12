@@ -14,6 +14,12 @@ public class Group implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Basic
+    private String name;
+
+    @Basic
+    private String description;
+
     @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKey(name = "id")
     private Map<Long, Person> members;
@@ -83,6 +89,22 @@ public class Group implements Serializable {
                 members.remove(entry.getKey());
             }
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getMemberTurnover() {

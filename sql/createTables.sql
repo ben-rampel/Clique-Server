@@ -1,10 +1,12 @@
-CREATE DATABASE clique;
-GRANT ALL ON clique.* TO 'clique'@'localhost' IDENTIFIED BY 'clique';
+#CREATE DATABASE clique;
+#GRANT ALL ON clique.* TO 'clique'@'localhost' IDENTIFIED BY 'clique';
 
 CREATE TABLE IF NOT EXISTS PersonGroup
 (
     Id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     MemberTurnover INTEGER         NOT NULL,
+    Name           VARCHAR(50),
+    Description    VARCHAR(2000),
     Longitude      DECIMAL(30, 10),
     Latitude       DECIMAL(30, 10),
     PRIMARY KEY (`Id`)
