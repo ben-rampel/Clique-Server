@@ -10,14 +10,25 @@ public class Location implements Serializable {
     private static final long serialVersionUID = 2L;
 
     @Basic
-    private final double longitude;
+    private double longitude;
 
     @Basic
-    private final double latitude;
+    private double latitude;
 
     public Location(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public Location() {
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
     public double getLongitude() {
