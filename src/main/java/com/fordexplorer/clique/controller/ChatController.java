@@ -29,7 +29,7 @@ public class ChatController {
     }
 
     @MessageMapping("/sendMessage")
-    public void acceptMessage(@RequestBody Message message) {
+    public void acceptMessage(Message message) {
         //Add message to list
         message.getAuthor().getCurrentGroup().addMessage(message);
         //Push message to group channel

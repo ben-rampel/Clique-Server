@@ -16,7 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class APIController {
@@ -87,7 +89,7 @@ public class APIController {
 
     //Get groups near user
     @GetMapping("/getGroups")
-    public List<Group> getGroups(@RequestParam Double longitude, @RequestParam Double latitude) {
+    public Map<String, List<Group>> getGroups(@RequestParam Double longitude, @RequestParam Double latitude) {
         logger.info("Finding group near location {} {}", latitude, longitude);
         Location location = new Location(latitude, longitude);
         List<Group> result = new ArrayList<>();
@@ -101,7 +103,9 @@ public class APIController {
             }
         }
         logger.info("Found {} groups near location {} {}", result.size(), latitude, longitude);
-        return result;
+        Map<String, List<Group>> response = new HashMap<>();
+        response.put("groups", result);
+        return response;
     }
 
     //Join group
