@@ -14,7 +14,7 @@ public class Group implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKey(name = "id")
     private Map<Long, Person> members;
 
@@ -29,6 +29,8 @@ public class Group implements Serializable {
     @Embedded
     private Location location;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "GroupId")
     private List<Message> groupMessages;
 
     public List<Message> getGroupMessages() {
