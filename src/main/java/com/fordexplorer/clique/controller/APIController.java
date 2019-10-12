@@ -39,7 +39,7 @@ public class APIController {
     public ResponseEntity<String> registerUser(@RequestBody Person person){
         logger.info("Registering user {}", person.getUsername());
         personRepository.save(person);
-        String token = String.format("{token: %s}", jwtTokenManager.createToken(person.getUsername()));
+        String token = String.format("{\n\"token\": \"%s\"\n}", jwtTokenManager.createToken(person.getUsername()));
         logger.info("Returning Token {}", token);
         return new ResponseEntity<>(token,HttpStatus.OK);
     }
