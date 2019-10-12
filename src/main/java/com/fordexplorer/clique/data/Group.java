@@ -29,7 +29,11 @@ public class Group implements Serializable {
     @Embedded
     private Location location;
 
-    List<Message> groupMessages;
+    private List<Message> groupMessages;
+
+    public List<Message> getGroupMessages() {
+        return groupMessages;
+    }
 
     public Group(){
         members = new HashMap<>();
