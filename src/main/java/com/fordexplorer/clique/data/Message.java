@@ -30,6 +30,9 @@ public class Message implements Serializable {
         this.date = LocalDateTime.now();
     }
 
+    public Message() {
+    }
+
     public Long getId() {
         return id;
     }

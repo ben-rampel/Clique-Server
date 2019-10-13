@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtTokenFilter extends GenericFilterBean {
@@ -30,6 +31,10 @@ public class JwtTokenFilter extends GenericFilterBean {
             Authentication auth = token != null ? jwtTokenProvider.getAuthentication(token) : null;
             SecurityContextHolder.getContext().setAuthentication(auth);
             logger.info("Authenticated {}", jwtTokenProvider.getUsername(token));
+        } else {
+            HttpServletResponse resp = (HttpServletResponse) res;
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
         filterChain.doFilter(req, res);
     }

@@ -67,7 +67,7 @@ public class JwtTokenManager {
             Jws<Claims> claims = Jwts.parser().setSigningKey(serverSecret).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new IllegalArgumentException("Expired or invalid JWT token");
+            return false;
         }
     }
 
