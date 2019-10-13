@@ -1,6 +1,5 @@
 package com.fordexplorer.clique.controller;
 
-import com.fordexplorer.clique.auth.JwtTokenManager;
 import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Location;
 import com.fordexplorer.clique.data.Message;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,44 +24,23 @@ public class APIController {
     private Logger logger = LoggerFactory.getLogger(APIController.class);
     private GroupRepository groupRepository;
     private PersonRepository personRepository;
-    private JwtTokenManager jwtTokenManager;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public APIController(GroupRepository groupRepository, PersonRepository personRepository, JwtTokenManager jwtTokenManager) {
+    public APIController(GroupRepository groupRepository, PersonRepository personRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.groupRepository = groupRepository;
         this.personRepository = personRepository;
-        this.jwtTokenManager = jwtTokenManager;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     /* Account management */
 
     //Create user
     @PostMapping("/registerUser")
-    public ResponseEntity<String> registerUser(@RequestBody Person person) {
+    public void registerUser(@RequestBody Person person) {
         logger.info("Registering user {}", person.getUsername());
-        personRepository.save(person);
-        String token = String.format("{\n\"token\": \"%s\"\n}", jwtTokenManager.createToken(person.getUsername()));
-        logger.info("Returning Token {}", token);
-        return new ResponseEntity<>(token, HttpStatus.OK);
-    }
-
-    //Login
-    //login(credentials) -> JWT Token
-    @PostMapping("/login")
-    public ResponseEntity<String> login(String username, String password) {
-        logger.info("Authentication user {}", username);
-        Person person = personRepository.findPersonByUsername(username);
-        if (person == null) {
-            logger.info("User {} Not Found", username);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (person.getPassword().equals(password)) {
-            logger.info("User {} logged in", username);
-            String token = String.format("{\n\"token\": \"%s\"\n}", jwtTokenManager.createToken(person.getUsername()));
-            return new ResponseEntity<>(token, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+        person.setPassword(bCryptPasswordEncoder.encode(person.getPassword()));
+        this.personRepository.save(person);
     }
 
     //Get user profile
@@ -97,7 +76,7 @@ public class APIController {
             //if group is within 1 mile of specified location
             double distance = g.getLocation().distanceTo(location);
             logger.info("Group {} distance {} miles", g.getName(), distance);
-            if (distance < 1) {
+            if (distance < 10) {
                 // break out of json loop
                 sanitizeGroup(g);
                 logger.info("Found Group {} with members {}", g.getName(), g.getMembers());
