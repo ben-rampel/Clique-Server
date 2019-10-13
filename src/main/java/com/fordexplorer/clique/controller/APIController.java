@@ -110,7 +110,7 @@ public class APIController {
     }
 
     //Join group
-    @PostMapping("/groups/{id}")
+    @PostMapping("/groups/{id}/requests")
     public ResponseEntity<String> joinGroup(@PathVariable Long id) {
         String username = SecureContextUtils.getCurrentUserName();
         Person person = personRepository.findPersonByUsername(username);
@@ -118,12 +118,41 @@ public class APIController {
         if (groupRepository.findById(id).isPresent()) {
             Group foundGroup = groupRepository.findById(id).get();
             logger.info("Added {} to the group {}", person.getUsername(), id);
-            person.setCurrentGroup(foundGroup);
-            personRepository.save(person);
+            foundGroup.addWannabeMember(person);
+            groupRepository.save(foundGroup);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/groups/{id}")
+    public ResponseEntity<String> acceptMember(@PathVariable Long id, @RequestParam Long memberId) {
+        Optional<Person> newMember = personRepository.findById(memberId);
+        Optional<Group> toJoin = groupRepository.findById(id);
+        if (newMember.isPresent() && toJoin.isPresent()) {
+            Person member = newMember.get();
+            Group group = toJoin.get();
+
+            member.setCurrentGroup(group);
+            group.addMember(member);
+
+            personRepository.save(member);
+            groupRepository.save(group);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/groups/{id}/requests")
+    public List<Person> pendingMembers(@PathVariable Long id) {
+        Optional<Group> group = groupRepository.findById(id);
+        if (group.isPresent()) {
+            Group g = group.get();
+            sanitizeGroup(g);
+            return g.getWannabeMembers();
+        }
+        return null;
     }
 
     //Leave group
