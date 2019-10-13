@@ -18,13 +18,11 @@ import java.util.Optional;
 @Controller
 public class ChatController {
     private SimpMessageSendingOperations messagingTemplate;
-    private GroupRepository groupRepository;
     private ObjectMapper mapper;
 
     @Autowired
-    public ChatController(SimpMessageSendingOperations messagingTemplate, GroupRepository groupRepository){
+    public ChatController(SimpMessageSendingOperations messagingTemplate){
         this.messagingTemplate = messagingTemplate;
-        this.groupRepository = groupRepository;
         mapper = new ObjectMapper();
     }
 
