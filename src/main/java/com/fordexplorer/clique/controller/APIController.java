@@ -57,7 +57,7 @@ public class APIController {
         }
         if (person.getPassword().equals(password)) {
             logger.info("User {} logged in", username);
-            String token = String.format("{token: %s}", jwtTokenManager.createToken(username));
+            String token = String.format("{\n\"token\": \"%s\"\n}", jwtTokenManager.createToken(person.getUsername()));
             return new ResponseEntity<>(token, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
