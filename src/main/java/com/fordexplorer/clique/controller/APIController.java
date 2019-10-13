@@ -3,6 +3,7 @@ package com.fordexplorer.clique.controller;
 import com.fordexplorer.clique.auth.JwtTokenManager;
 import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Location;
+import com.fordexplorer.clique.data.Message;
 import com.fordexplorer.clique.data.Person;
 import com.fordexplorer.clique.db.GroupRepository;
 import com.fordexplorer.clique.db.PersonRepository;
@@ -148,6 +149,12 @@ public class APIController {
         Group g = found.get();
         sanitizeGroup(g);
         return g;
+    }
+
+    @GetMapping("/chat/{id}/messages")
+    public List<Message> getMessages(@PathVariable Long id){
+        Optional<Group> group = groupRepository.findById(id);
+        return group.map(Group::getGroupMessages).orElse(null);
     }
 
     private void sanitizeGroup(Group g) {

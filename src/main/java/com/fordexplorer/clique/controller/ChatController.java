@@ -18,13 +18,11 @@ import java.util.Optional;
 @Controller
 public class ChatController {
     private SimpMessageSendingOperations messagingTemplate;
-    private GroupRepository groupRepository;
     private ObjectMapper mapper;
 
     @Autowired
-    public ChatController(SimpMessageSendingOperations messagingTemplate, GroupRepository groupRepository){
+    public ChatController(SimpMessageSendingOperations messagingTemplate){
         this.messagingTemplate = messagingTemplate;
-        this.groupRepository = groupRepository;
         mapper = new ObjectMapper();
     }
 
@@ -38,12 +36,6 @@ public class ChatController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-    }
-
-    @GetMapping("/chat/{id}/messages")
-    public List<Message> getMessages(@PathVariable Long id){
-        Optional<Group> group = groupRepository.findById(id);
-        return group.map(Group::getGroupMessages).orElse(null);
     }
 
     private void sendMessage(Message message, Group group) throws JsonProcessingException {
