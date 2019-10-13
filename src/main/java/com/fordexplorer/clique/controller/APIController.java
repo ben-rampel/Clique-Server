@@ -136,6 +136,15 @@ public class APIController {
         return group.map(Group::getGroupMessages).orElse(null);
     }
 
+    @PostMapping("/chat/{id}}/sendMessage")
+    public ResponseEntity<String> sendMessage(@PathVariable Long id, @RequestBody Message message){
+        if(groupRepository.findById(id).isPresent()){
+            groupRepository.findById(id).get().addMessage(message);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     private void sanitizeGroup(Group g) {
         // break out of json loop
         for (Person p : g.getMembers()) {
