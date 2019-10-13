@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +23,7 @@ public class APIController {
     private GroupRepository groupRepository;
     private PersonRepository personRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
 
     @Autowired
     public APIController(GroupRepository groupRepository, PersonRepository personRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -56,9 +55,11 @@ public class APIController {
 
     //Create group
     @PostMapping("/createGroup")
-    public void createGroup(@AuthenticationPrincipal UserDetails person, @RequestBody Group toAdd) {
-        logger.info("{} is trying to create group {}", person.getUsername(), toAdd.getName());
-        Person owner = personRepository.findPersonByUsername(person.getUsername());
+    public void createGroup(@RequestBody Group toAdd) {
+        String username = SecureContextUtils.getCurrentUserName();
+        logger.info("Got UserDetails {}", username);
+        logger.info("{} is trying to create group {}", username, toAdd.getName());
+        Person owner = personRepository.findPersonByUsername(username);
         groupRepository.save(toAdd);
         owner.setCurrentGroup(toAdd);
         personRepository.save(owner);
@@ -91,8 +92,9 @@ public class APIController {
 
     //Join group
     @PostMapping("/groups/{id}")
-    public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal UserDetails authInfo) {
-        Person person = personRepository.findPersonByUsername(authInfo.getUsername());
+    public ResponseEntity<String> joinGroup(@PathVariable Long id) {
+        String username = SecureContextUtils.getCurrentUserName();
+        Person person = personRepository.findPersonByUsername(username);
         logger.info("Adding {} to group {}", person.getUsername(), id);
         if (groupRepository.findById(id).isPresent()) {
             Group foundGroup = groupRepository.findById(id).get();
@@ -107,8 +109,10 @@ public class APIController {
 
     //Leave group
     @DeleteMapping("/groups/{id}/me")
-    public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
-        logger.info("{} is trying to leave group {}", person.getUsername(), id);
+    public ResponseEntity<String> leaveGroup(@PathVariable Long id) {
+        String username = SecureContextUtils.getCurrentUserName();
+        logger.info("{} is trying to leave group {}", username, id);
+        Person person = personRepository.findPersonByUsername(username);
         if (groupRepository.findById(id).isPresent()) {
             groupRepository.findById(id).get().removeMember(person);
             logger.info("{} has left group {}", person.getUsername(), id);

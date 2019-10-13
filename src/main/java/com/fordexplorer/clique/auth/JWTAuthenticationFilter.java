@@ -6,6 +6,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +27,7 @@ import java.util.Date;
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
-    private Key serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -38,12 +40,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Person creds = new ObjectMapper()
                     .readValue(req.getInputStream(), Person.class);
 
-            return authenticationManager.authenticate(
+            logger.info("Attempting to Authenticate user {} password {}", creds.getUsername(), creds.getPassword());
+            Authentication result = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             creds.getUsername(),
                             creds.getPassword(),
                             new ArrayList<>())
             );
+            logger.info("authenticated result {}", result);
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,6 +66,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Date now = new Date();
         Date valid = new Date(Long.MAX_VALUE);
 
+        Key serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(valid).signWith(serverSecret, SignatureAlgorithm.HS256).compact();
         res.addHeader("Authorization", "Bearer " + token);
     }
