@@ -125,6 +125,27 @@ public class Group implements Serializable {
         return wannabeMembers;
     }
 
+    public List<String> getInterests(){
+        Map<String, Integer> interests = new LinkedHashMap<>();
+        for(Person p : getMembers()){
+            for(String s : p.getInterests()) {
+                if (interests.containsKey(s)) {
+                    interests.put(s, interests.get(s) + 1);
+                } else {
+                    interests.put(s, 1);
+                }
+            }
+        }
+        Stack<String> stack = new Stack<>();
+        interests.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEachOrdered(entry -> stack.push(entry.getKey()));
+
+        List<String> result = new LinkedList<>();
+        for(int i = 0; i < 5; i++){
+            result.add(stack.pop());
+        }
+        return result;
+    }
+
     public void setWannabeMembers(List<Person> wannabeMembers) {
         for (Person p : wannabeMembers) {
             this.members.put(p.getId(), p);
@@ -148,4 +169,5 @@ public class Group implements Serializable {
     public Long getId() {
         return id;
     }
+
 }
