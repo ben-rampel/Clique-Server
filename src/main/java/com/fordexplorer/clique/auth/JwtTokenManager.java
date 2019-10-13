@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class JwtTokenManager {
         SecureRandom rand = new SecureRandom();
         byte[] key = new byte[32];
         rand.nextBytes(key);
-        serverSecret = Keys.hmacShaKeyFor(key);
+        serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
     }
 
     public String createToken(String username) {

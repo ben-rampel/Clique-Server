@@ -65,7 +65,7 @@ public class APIController {
     }
 
     //Get user profile
-    @GetMapping("/getUser/{username}")
+    @GetMapping("/users/{username}")
     public Person getUser(@PathVariable String username) {
         logger.info("Getting User Profile for {}", username);
         return personRepository.findPersonByUsername(username);
@@ -111,7 +111,7 @@ public class APIController {
     }
 
     //Join group
-    @PostMapping("/joinGroup/{id}")
+    @PostMapping("/groups/{id}")
     public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal UserDetails authInfo) {
         Person person = personRepository.findPersonByUsername(authInfo.getUsername());
         logger.info("Adding {} to group {}", person.getUsername(), id);
@@ -127,7 +127,7 @@ public class APIController {
     }
 
     //Leave group
-    @PostMapping("/leaveGroup/{id}")
+    @DeleteMapping("/groups/{id}/me")
     public ResponseEntity<String> leaveGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
         logger.info("{} is trying to leave group {}", person.getUsername(), id);
         if (groupRepository.findById(id).isPresent()) {
@@ -140,7 +140,7 @@ public class APIController {
     }
 
     //Get group info, including people wanting to join group
-    @GetMapping("/getGroup/{id}")
+    @GetMapping("/groups/{id}")
     public Group getGroup(@PathVariable Long id) {
         logger.info("Getting group {}", id);
         Optional<Group> found = groupRepository.findById(id);
