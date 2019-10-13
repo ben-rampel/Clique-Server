@@ -35,7 +35,7 @@ public class Group implements Serializable {
     @Embedded
     private Location location;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
     @JoinColumn(name = "GroupId")
     private List<Message> groupMessages;
 
