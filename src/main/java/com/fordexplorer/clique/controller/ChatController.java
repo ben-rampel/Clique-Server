@@ -40,12 +40,6 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/chat/{id}/messages")
-    public List<Message> getMessages(@PathVariable Long id){
-        Optional<Group> group = groupRepository.findById(id);
-        return group.map(Group::getGroupMessages).orElse(null);
-    }
-
     private void sendMessage(Message message, Group group) throws JsonProcessingException {
         messagingTemplate.convertAndSend(chatURL(group), mapper.writeValueAsString(message));
     }

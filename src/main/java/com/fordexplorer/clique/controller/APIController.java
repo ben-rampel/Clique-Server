@@ -3,6 +3,7 @@ package com.fordexplorer.clique.controller;
 import com.fordexplorer.clique.auth.JwtTokenManager;
 import com.fordexplorer.clique.data.Group;
 import com.fordexplorer.clique.data.Location;
+import com.fordexplorer.clique.data.Message;
 import com.fordexplorer.clique.data.Person;
 import com.fordexplorer.clique.db.GroupRepository;
 import com.fordexplorer.clique.db.PersonRepository;
@@ -15,10 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class APIController {
@@ -140,5 +138,12 @@ public class APIController {
         logger.info("Getting group {}", id);
         if (!groupRepository.findById(id).isPresent()) return null;
         return groupRepository.findById(id).get();
+    }
+
+    //get group messages
+    @GetMapping("/chat/{id}/messages")
+    public List<Message> getMessages(@PathVariable Long id){
+        Optional<Group> group = groupRepository.findById(id);
+        return group.map(Group::getGroupMessages).orElse(null);
     }
 }
