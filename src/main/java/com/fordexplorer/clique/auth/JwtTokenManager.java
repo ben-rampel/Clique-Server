@@ -2,6 +2,8 @@ package com.fordexplorer.clique.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -21,14 +23,18 @@ public class JwtTokenManager {
     @Autowired
     private UserDetailService userDetailsService;
     private Key serverSecret;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @PostConstruct
     public void init() {
-        serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
+        SecureRandom rand = new SecureRandom();
+        byte[] key = new byte[32];
+        rand.nextBytes(key);
+        serverSecret = Keys.hmacShaKeyFor(key);
     }
 
     public String createToken(String username) {
-
+        logger.info("Creating token for user {}", username);
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("roles", Arrays.asList("user"));
 
@@ -51,6 +57,7 @@ public class JwtTokenManager {
     }
 
     public Authentication getAuthentication(String token) {
+        logger.info("Loading user info for {}", getUsername(token));
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities());
     }

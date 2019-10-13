@@ -79,8 +79,6 @@ public class APIController {
     public void createGroup(@AuthenticationPrincipal UserDetails person, @RequestBody Group toAdd) {
         logger.info("{} is trying to create group {}", person.getUsername(), toAdd.getName());
         Person owner = personRepository.findPersonByUsername(person.getUsername());
-        toAdd.addMember(owner);
-
         groupRepository.save(toAdd);
         owner.setCurrentGroup(toAdd);
         personRepository.save(owner);
