@@ -70,6 +70,8 @@ public class Group implements Serializable {
                 pendingMemberMap.put(id, this.members.get(id));
             }
         }
+        int newSize = this.members.size();
+        this.memberTurnover += newSize - this.memberTurnover;
 
         this.members.clear();
         for (Person p : members) {
@@ -81,12 +83,15 @@ public class Group implements Serializable {
     public void addMember(Person person){
         members.put(person.getId(), person);
         this.pendingMembers.remove(person.getId());
+        this.memberTurnover += 1;
     }
 
     public void removeMember(Person person){
         for(Map.Entry<Long, Person> entry : members.entrySet()){
             if(entry.getValue().equals(person)){
                 members.remove(entry.getKey());
+                this.memberTurnover -= 1;
+                break;
             }
         }
     }

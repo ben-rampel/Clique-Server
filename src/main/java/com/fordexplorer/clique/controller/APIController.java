@@ -6,14 +6,21 @@ import com.fordexplorer.clique.data.Message;
 import com.fordexplorer.clique.data.Person;
 import com.fordexplorer.clique.db.GroupRepository;
 import com.fordexplorer.clique.db.PersonRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.*;
 
 @RestController
@@ -36,10 +43,22 @@ public class APIController {
 
     //Create user
     @PostMapping("/registerUser")
-    public void registerUser(@RequestBody Person person) {
+    public HttpEntity<String> registerUser(@RequestBody Person person) {
         logger.info("Registering user {}", person.getUsername());
         person.setPassword(bCryptPasswordEncoder.encode(person.getPassword()));
         this.personRepository.save(person);
+
+        Claims claims = Jwts.claims().setSubject(person.getUsername());
+        claims.put("roles", new ArrayList<>());
+
+        Date now = new Date();
+        Date valid = new Date(Long.MAX_VALUE);
+
+        Key serverSecret = Keys.hmacShaKeyFor("passwordpasswordpasswordpassword".getBytes(StandardCharsets.UTF_8));
+        String token = Jwts.builder().setClaims(claims).setIssuedAt(now).setExpiration(valid).signWith(serverSecret, SignatureAlgorithm.HS256).compact();
+        String result = String.format("{\n\"token\":\"%s\"\n}", token);
+
+        return new HttpEntity<>(result);
     }
 
     //Get user profile
@@ -113,9 +132,16 @@ public class APIController {
         String username = SecureContextUtils.getCurrentUserName();
         logger.info("{} is trying to leave group {}", username, id);
         Person person = personRepository.findPersonByUsername(username);
-        if (groupRepository.findById(id).isPresent()) {
-            groupRepository.findById(id).get().removeMember(person);
+        Optional<Group> toLeave = groupRepository.findById(id);
+        if (toLeave.isPresent()) {
+            Group g = toLeave.get();
+            g.removeMember(person);
             logger.info("{} has left group {}", person.getUsername(), id);
+
+            if (g.getMemberTurnover() <= 0 || g.getMembers().size() == 0) {
+                logger.info("Group {} reached end of life, cleaning it up", username);
+                groupRepository.delete(g);
+            }
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -135,9 +161,18 @@ public class APIController {
     }
 
     @GetMapping("/chat/{id}/messages")
-    public List<Message> getMessages(@PathVariable Long id){
+    public @ResponseBody
+    List<Message> getMessages(@PathVariable Long id) {
         Optional<Group> group = groupRepository.findById(id);
-        return group.map(Group::getGroupMessages).orElse(null);
+        if (group.isPresent()) {
+            Group g = group.get();
+            logger.info("Querying messages for group {}", g.getName());
+            sanitizeGroup(g);
+            List<Message> result = g.getGroupMessages();
+            logger.info("Found {} messages", result.size());
+            return result;
+        }
+        return null;
     }
 
     @PostMapping("/chat/{id}}/sendMessage")

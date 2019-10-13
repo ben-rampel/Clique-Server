@@ -24,12 +24,6 @@ public class Message implements Serializable {
     @Column(name = "Date", columnDefinition = "TIMESTAMP")
     private LocalDateTime date;
 
-    public Message(Person author, String content) {
-        this.author = author;
-        this.content = content;
-        this.date = LocalDateTime.now();
-    }
-
     public Message() {
     }
 
