@@ -15,10 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class APIController {
@@ -83,7 +80,10 @@ public class APIController {
         logger.info("{} is trying to create group {}", person.getUsername(), toAdd.getName());
         Person owner = personRepository.findPersonByUsername(person.getUsername());
         toAdd.addMember(owner);
+
         groupRepository.save(toAdd);
+        owner.setCurrentGroup(toAdd);
+        personRepository.save(owner);
         logger.info("group {} is created", toAdd.getName());
     }
 
@@ -99,6 +99,9 @@ public class APIController {
             double distance = g.getLocation().distanceTo(location);
             logger.info("Group {} distance {} miles", g.getName(), distance);
             if (distance < 1) {
+                // break out of json loop
+                sanitizeGroup(g);
+                logger.info("Found Group {} with members {}", g.getName(), g.getMembers());
                 result.add(g);
             }
         }
@@ -110,11 +113,14 @@ public class APIController {
 
     //Join group
     @PostMapping("/joinGroup/{id}")
-    public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal Person person) {
+    public ResponseEntity<String> joinGroup(@PathVariable Long id, @AuthenticationPrincipal UserDetails authInfo) {
+        Person person = personRepository.findPersonByUsername(authInfo.getUsername());
         logger.info("Adding {} to group {}", person.getUsername(), id);
         if (groupRepository.findById(id).isPresent()) {
-            groupRepository.findById(id).get().addMember(person);
+            Group foundGroup = groupRepository.findById(id).get();
             logger.info("Added {} to the group {}", person.getUsername(), id);
+            person.setCurrentGroup(foundGroup);
+            personRepository.save(person);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -138,7 +144,22 @@ public class APIController {
     @GetMapping("/getGroup/{id}")
     public Group getGroup(@PathVariable Long id) {
         logger.info("Getting group {}", id);
-        if (!groupRepository.findById(id).isPresent()) return null;
-        return groupRepository.findById(id).get();
+        Optional<Group> found = groupRepository.findById(id);
+        if (!found.isPresent()) return null;
+
+        Group g = found.get();
+        sanitizeGroup(g);
+        return g;
     }
+
+    private void sanitizeGroup(Group g) {
+        // break out of json loop
+        for (Person p : g.getMembers()) {
+            p.setCurrentGroup(null);
+        }
+        for (Person p : g.getWannabeMembers()) {
+            p.setCurrentGroup(null);
+        }
+    }
+
 }

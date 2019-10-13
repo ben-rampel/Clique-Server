@@ -20,7 +20,7 @@ public class Group implements Serializable {
     @Basic
     private String description;
 
-    @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "currentGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @MapKey(name = "id")
     private Map<Long, Person> members;
 

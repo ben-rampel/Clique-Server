@@ -54,5 +54,6 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
 
     testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
